@@ -15,3 +15,5 @@ pyenv rehash
 pipenv install --dev --python 3.9.1
 pipenv shell
 ```
+
+### git使い方練習（後で削除）
