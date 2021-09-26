@@ -15,21 +15,35 @@ def get_room(room_id:int, URL:str=URL, session=session) -> dict:
     result = session.get(url_get_room)
     return result.json()
 
-# 指定した対戦部屋の状況をチェック,入室するか選択
-def check_room() -> Tuple[int, dict]:
-    fin = ""
-    while fin != "y":
-        room_id_str = input("入室したい対戦部屋のIDを入力してください -->>")
-        room_id = int(room_id_str)
-        result = get_room(room_id)
-        print(result)
-        if result["state"] == -1:
-            fin = input("部屋には誰もいません．入室しますか？[y/n] -->>")
-        elif result["state"] == 1:
-            fin = input("{}が待機しています．入室しますか？[y/n] -->>".format(result["player1"]))
+# 部屋IDの入力
+def input_roomID():
+    room_id_str = input("入室したい対戦部屋のIDを入力してください -->>")
+    room_id = int(room_id_str)
+    return room_id
+
+# 部屋の情報を取得して，状況を返す
+def check_room(room_id:int):
+    get_room_result = get_room(room_id)
+    if get_room_result["state"] == -1:
+        print("部屋には誰もいません")
+        return True
+    elif get_room_result["state"] == 1:
+        print("{}が待機しています".format(get_room_result["player1"]))
+        return True
+    else:
+        print("すでに部屋が満席です．別の部屋IDを入力してください")
+        return False
+
+# 部屋に入室するか選択する
+def ask_enter_room():
+    while True:
+        ans = input("入室しますか？[y/n] -->>")
+        if ans == "y":
+            return True
+        elif ans == "n":
+            return False
         else:
-            print("すでに部屋が満席です．別の部屋IDを入力してください")
-    return room_id, result
+            print("y/n以外の入力がされました．入力をやり直してください")
 
 # 対戦部屋へユーザーを登録
 def enter_room(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> None:
@@ -42,32 +56,53 @@ def enter_room(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> None
     result_post = session.post(url_enter_room, headers=headers, json=post_data)
     print(result_post.json())
 
+def input_hidden() -> str:
+    hidden_number = input("相手に当てさせる番号を入力してください -->>")
+    return hidden_number
+
 # 相手に当てさせる番号をサーバーに送る
-def post_hidden(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> None:
+def post_hidden(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> str:
     headers = {"Content-Type" : "application/json"}
     url_get_table = URL + "/rooms/" + str(room_id) + "/players/" + i_am + "/hidden"
-    code = 0
-    while code != 200:
+    
+    while True:
+        hidden_number = input_hidden()
         post_data = {
             "player_id": players[i_am],
-            "hidden_number": input("相手に当てさせる番号を入力してください -->>")
+            "hidden_number": hidden_number
         }
         result_post = session.post(url_get_table, headers=headers, json=post_data)
-        code = result_post.status_code
+        if result_post.status_code == 200:
+            print(f"{hidden_number}を相手に当ててもらいます")
+            return hidden_number
+        else:
+            print("無効な入力がされました")
 
-# メンツがそろったか確認して相手が当てる番号を決める
-def make_hidden(result, room_id) -> None:
-    while result["state"] != 2:
-        result = get_room(room_id)
-    post_hidden(room_id)
+def run_first_half() -> Tuple[int, str]:
+    """プログラム前半（ID入力から相手が当てる数字を入力まで）
+
+    :rtype: Tuple[int, str]
+    :return: 入室したルームID，相手が当てる数字
+    """
+    enter = ""
+    while enter != True: # 部屋に入るまで繰り返す
+        room = ""
+        while room != True: # 入れる部屋を選ぶまで繰り返す
+            room_id = input_roomID()
+            room = check_room(room_id)
+        enter = ask_enter_room()
+    enter_room(room_id)
+    get_room_result = get_room(room_id)
+    while get_room_result["state"] != 2:
+        get_room_result = get_room(room_id)
+    hidden_number = post_hidden(room_id)
+    return room_id, hidden_number
 
 # 対戦情報テーブル(現在のターン, hit&blowの履歴, 勝敗の判定)を取得する
 def get_table(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> dict:
     url_get_table = URL + "/rooms/" + str(room_id) + "/players/" + i_am + "/table"
     table_result = session.get(url_get_table)
-    # print(table_result.status_code)
-    # print(table_result.json())
-    return table_result.json
+    return table_result.json()
 
 # 勝敗が決まったかチェック
 def check_win(table_result:dict) -> bool:
@@ -101,27 +136,24 @@ def post_guess(room_id:int, i_am:str=i_am, URL:str=URL, session=session):
         "guess": input("相手の番号を推測して入力してください -->>") # <<-- 推測アルゴリズムの出力先
     }
     result_post = session.post(url_post_guess, headers=headers, json=post_data)
-    # print(result_post.status_code)
-    # print(result_post.json())
 
-def main():
-    room_id, result = check_room() #部屋番号を入れて空き状況を確認する．入室を決めた部屋の情報を返す．
-    enter_room(room_id) #入室する
-    make_hidden(result, room_id) #相手に当てさせる番号を決める．例外処理もOK
-
+def run_second_half(room_id):
     while True:
         turn = False
         while turn != True:
-            table_result = get_table(room_id, i_am)
-            table_result = table_result.json()
+            table_result = get_table(room_id)
             if check_win(table_result) == False:
                 end_game(table_result)
                 sys.exit()
             else:
                 turn = check_turn(table_result)
-        post_guess(room_id, i_am)
-        table_result = get_table(room_id, i_am)
-        print(table_result.json()["table"])
+        post_guess(room_id)
+        table_result = get_table(room_id)
+        print(table_result["table"])
+
+def main():
+    room_id, hidden_number = run_first_half()
+    run_second_half(room_id)
 
 if __name__ == "__main__":
     main()
