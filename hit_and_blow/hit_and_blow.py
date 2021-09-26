@@ -1,6 +1,8 @@
 # モジュールインポート，URL，プレイヤー情報の辞書登録
 import requests
 import sys
+from typing import Tuple
+
 URL = "https://damp-earth-70561.herokuapp.com"
 session = requests.Session()
 players = {"C":"290d6313-c662-45b6-82d6-6afb631ade08", 
@@ -8,24 +10,13 @@ players = {"C":"290d6313-c662-45b6-82d6-6afb631ade08",
 i_am = "C"
 
 # 指定した対戦部屋情報の取得
-def get_room(room_id:int, URL=URL, session=session):
+def get_room(room_id:int, URL:str=URL, session=session) -> dict:
     url_get_room = URL + "/rooms/" + str(room_id)
     result = session.get(url_get_room)
     return result.json()
 
-# 対戦部屋へユーザーを登録
-def enter_room(room_id:int, URL=URL, session=session):
-    headers = {"Content-Type" : "application/json"}
-    url_enter_room = URL + "/rooms"
-    post_data = {
-        "player_id": players[i_am],
-        "room_id": room_id
-    }
-    result_post = session.post(url_enter_room, headers=headers, json=post_data)
-    print(result_post.json())
-
-# 指定した対戦部屋の状況をチェック
-def check_room():
+# 指定した対戦部屋の状況をチェック,入室するか選択
+def check_room() -> Tuple[int, dict]:
     fin = ""
     while fin != "y":
         room_id_str = input("入室したい対戦部屋のIDを入力してください -->>")
@@ -40,8 +31,19 @@ def check_room():
             print("すでに部屋が満席です．別の部屋IDを入力してください")
     return room_id, result
 
+# 対戦部屋へユーザーを登録
+def enter_room(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> None:
+    headers = {"Content-Type" : "application/json"}
+    url_enter_room = URL + "/rooms"
+    post_data = {
+        "player_id": players[i_am],
+        "room_id": room_id
+        }
+    result_post = session.post(url_enter_room, headers=headers, json=post_data)
+    print(result_post.json())
+
 # 相手に当てさせる番号をサーバーに送る
-def post_hidden(room_id:int, URL=URL, session=session):
+def post_hidden(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> None:
     headers = {"Content-Type" : "application/json"}
     url_get_table = URL + "/rooms/" + str(room_id) + "/players/" + i_am + "/hidden"
     code = 0
@@ -53,36 +55,36 @@ def post_hidden(room_id:int, URL=URL, session=session):
         result_post = session.post(url_get_table, headers=headers, json=post_data)
         code = result_post.status_code
 
-# メンツがそろったか確認して相手に当てさせる番号を決める
-def make_hidden(result, room_id):
+# メンツがそろったか確認して相手が当てる番号を決める
+def make_hidden(result, room_id) -> None:
     while result["state"] != 2:
         result = get_room(room_id)
     post_hidden(room_id)
 
 # 対戦情報テーブル(現在のターン, hit&blowの履歴, 勝敗の判定)を取得する
-def get_table(room_id:int, i_am, URL=URL, session=session):
+def get_table(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> dict:
     url_get_table = URL + "/rooms/" + str(room_id) + "/players/" + i_am + "/table"
     table_result = session.get(url_get_table)
     # print(table_result.status_code)
     # print(table_result.json())
-    return table_result
+    return table_result.json
 
 # 勝敗が決まったかチェック
-def check_win(table_result):
+def check_win(table_result:dict) -> bool:
     if table_result["state"] == 2:
         return True # →ゲーム続行
     else:
         return False # →ゲーム終了
 
 # 自分のターンかチェック
-def check_turn(table_result):
+def check_turn(table_result, i_am:str=i_am) -> bool:
     if table_result["now_player"] == i_am:
         return True # →自分のターン
     else:
         return False # →相手のターン
 
 # ゲーム終了
-def end_game(table_result):
+def end_game(table_result, i_am:str=i_am):
     if table_result["winner"] == i_am:
         print("あなたの勝ちです！おめでとう！")
     elif table_result["winner"] == None:
@@ -91,12 +93,12 @@ def end_game(table_result):
         print("あなたの負けです...")
 
 # 推測した数字を登録する
-def post_guess(room_id:int, i_am, URL=URL, session=session):
+def post_guess(room_id:int, i_am:str=i_am, URL:str=URL, session=session):
     headers = {"Content-Type" : "application/json"}
     url_post_guess = URL + "/rooms/" + str(room_id) + "/players/" + i_am + "/table/guesses"
     post_data = {
         "player_id": players[i_am],
-        "guess": input("相手の番号を推測して入力してください -->>")
+        "guess": input("相手の番号を推測して入力してください -->>") # <<-- 推測アルゴリズムの出力先
     }
     result_post = session.post(url_post_guess, headers=headers, json=post_data)
     # print(result_post.status_code)
