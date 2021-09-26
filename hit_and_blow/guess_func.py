@@ -21,7 +21,7 @@ def make_init(num_list, answer, guess="", cost=0):
         cost+=1
         # getした情報がhit:0, blow:0 なら, 推測に移行
         if info["hit"] == 0 and info["blow"] == 0:
-            print("~~~ 推測スタート ~~~\n初期数列:", guess, info)
+            print("~~~ 推測スタート ~~~\n正解:", answer, "\n初期数列:", guess, info, "\n<0番目の数字を探索>\n候補", num_list[5:])
             break
     return(guess, cost)
 
@@ -41,13 +41,17 @@ def guess_func(num_list, guess, answer, cost=0):
                 guess = guess.replace(num, num_list[j])
                 # 候補の数字リストからhitした数字を消す
                 num_list.pop(j)
+                if i < 4:
+                    print(guess, "{'hit': "+str(i+1)+", 'blow': 0}\n<"+str(i+1)+"番目の数字を探索>\n候補", num_list[5:])
+                else:
+                    print(guess, "{'hit': "+str(i+1)+", 'blow': 0}")
                 break
             else: 
-                pass
+                print(guess1)
     return(guess, cost)
 
 def main():
-    answer = "a3f57"
+    answer = "2de5a"
     num_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
     init_guess, cost1 = make_init(num_list, answer)
     final_guess, cost2 = guess_func(num_list, init_guess, answer)
@@ -55,4 +59,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
