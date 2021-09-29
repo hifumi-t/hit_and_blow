@@ -35,47 +35,47 @@ def narrow_ans_list(guess, result, ans_list):
 
 
 # 実行してみる
-# ans = random.sample(num_list, 5) # 答えをランダムに決める
-# ans = ans[0]+ans[1]+ans[2]+ans[3]+ans[4]
-# print(f"正解は{ans}")
-# print("----------------------")
-# guess = "12345" # 初期予測（適当）
+ans = random.sample(num_list, 5) # 答えをランダムに決める
+ans = ans[0]+ans[1]+ans[2]+ans[3]+ans[4]
+print(f"正解は{ans}")
+print("----------------------")
+guess = "12345" # 初期予測（適当）
 
-# ans_list = make_ans_list(num_list) # いったん全候補をリストにぶちこむ
-# count = 0
-# while True:
-#     count += 1
-#     result = hit_blow(guess, ans)
-#     ans_list = narrow_ans_list(guess, result, ans_list)
-#     print(guess + "と予想して残り" + str(len(ans_list)) + "パターン" + "---------" + "{}hit{}blow".format(result[0],result[1]))
-#     guess = ans_list[0] # 正解候補の中から適当に（とりあえず最初の項）次の予測を決める
-#     if result == [5, 0]:
-#         break
+ans_list = make_ans_list(num_list) # いったん全候補をリストにぶちこむ
+count = 0
+while True:
+    count += 1
+    result = hit_blow(guess, ans)
+    ans_list = narrow_ans_list(guess, result, ans_list)
+    print(guess + "と予想して残り" + str(len(ans_list)) + "パターン" + "---------" + "{}hit{}blow".format(result[0],result[1]))
+    guess = ans_list[0] # 正解候補の中から適当に（とりあえず最初の項）次の予測を決める
+    if result == [5, 0]:
+        break
 
-# print("----------------------")
-# print(f"{count}回で正解！")
+print("----------------------")
+print(f"{count}回で正解！")
 
 
 # めっちゃ実行する(100回やるのに2分くらいかかった...)
-count_list = []
-for i in range(100):
-    ans = random.sample(num_list, 5) # 答えをランダムに決める
-    ans = ans[0]+ans[1]+ans[2]+ans[3]+ans[4]
-    guess = "12345" # 初期予測（適当）
+# count_list = []
+# for i in range(100):
+#     ans = random.sample(num_list, 5) # 答えをランダムに決める
+#     ans = ans[0]+ans[1]+ans[2]+ans[3]+ans[4]
+#     guess = "12345" # 初期予測（適当）
 
-    ans_list = make_ans_list(num_list) # いったん全候補をリストにぶちこむ
-    count = 0
-    while True:
-        count += 1
-        result = hit_blow(guess, ans)
-        ans_list = narrow_ans_list(guess, result, ans_list)
-        guess = ans_list[0] # 正解候補の中から適当に（とりあえず最初の項）次の予測を決める
-        if result == [5, 0]:
-            break
-    count_list.append(count)
+#     ans_list = make_ans_list(num_list) # いったん全候補をリストにぶちこむ
+#     count = 0
+#     while True:
+#         count += 1
+#         result = hit_blow(guess, ans)
+#         ans_list = narrow_ans_list(guess, result, ans_list)
+#         guess = ans_list[0] # 正解候補の中から適当に（とりあえず最初の項）次の予測を決める
+#         if result == [5, 0]:
+#             break
+#     count_list.append(count)
 
 
-# 後処理
-print(np.mean(count_list))
-print(np.std(count_list))
-plt.hist(count_list)
+# # 後処理
+# print(np.mean(count_list))
+# print(np.std(count_list))
+# plt.hist(count_list)
