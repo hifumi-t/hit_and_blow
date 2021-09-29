@@ -1,6 +1,5 @@
 # モジュールインポート，URL，プレイヤー情報の辞書登録
 import requests
-import sys
 from typing import Tuple
 
 URL = "https://damp-earth-70561.herokuapp.com"
@@ -144,7 +143,7 @@ def run_second_half(room_id):
             table_result = get_table(room_id)
             if check_win(table_result) == False:
                 end_game(table_result)
-                sys.exit()
+                return
             else:
                 turn = check_turn(table_result)
         post_guess(room_id)
