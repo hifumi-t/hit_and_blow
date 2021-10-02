@@ -1,17 +1,21 @@
-# 必要なモジュールの取り込み
 from flask import Flask
+from flask import render_template
 
-# Flaskオブジェクトの生成 --- (*1)
 app = Flask(__name__)
 
-# ルート( / )へアクセスがあった時の処理を記述 --- (*2)
+bullets = [
+    '箇条書き１',
+    '箇条書き２',
+    '箇条書き３',
+    '箇条書き４',
+    '箇条書き５',
+    '箇条書き６',
+    '箇条書き７',
+    '箇条書き８',
+    '箇条書き９'
+]
 
 
 @app.route("/")
-def root():
-    return "Hello"
-
-
-# サーバーを起動 --- (*3)
-if __name__ == "__main__":
-    app.run(debug=True, port=8888)
+def hello():
+    return render_template('hello.html', bullets=bullets)
