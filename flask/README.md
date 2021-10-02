@@ -2,10 +2,12 @@
 ##### 作成者：tanaka，2021年10月2日
 
 ## Flaskアプリケーションの実行
+- ディレクトリを移動
 - FLASK_APP環境変数を設定しておく
 - Powershellで以下を実行
 ```sh
-> $env:FLASK_APP = "hello"
+> cd flask
+> $env:FLASK_APP = "hello" # hello.pyがメインファイルの場合
 > flask run
  * Running on http://127.0.0.1:5000/
 ```
