@@ -2,6 +2,7 @@
 import itertools
 import requests
 import random
+import numpy as np
 from typing import Tuple
 
 URL = "https://damp-earth-70561.herokuapp.com"
@@ -83,7 +84,6 @@ def post_hidden(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> str
 
 def run_first_half() -> Tuple[int, str]:
     """プログラム前半（ID入力から相手が当てる数字を入力まで）
-
     :rtype: Tuple[int, str]
     :return: 入室したルームID，相手が当てる数字
     """
@@ -148,14 +148,17 @@ def make_ans_list(num_list):
         ans_list.append(i[0]+i[1]+i[2]+i[3]+i[4])
     return ans_list
 
-def narrow_ans_list(guess, result, ans_list):
+def narrow_ans_list(guess, result, ans_list, strength=100):
     new_ans_list = []
     length = len(ans_list)
     for ans in ans_list[:length+1]:
         h_b = hit_blow(guess, ans)
-        if h_b == result: # もし3hit 2blowなら
+        lot = random.randint(0,100)
+        if h_b == result: # 結果と一致するなら
             new_ans_list.append(ans) # 候補リストに加える
-        else: # 3hit 2blowじゃないなら
+        elif h_b != result and lot > strength: # 結果と違うとしても一定確率で
+            new_ans_list.append(ans) # 候補リストに加える
+        else: # 結果と一致しないなら
             pass # なにもしない
     ans_list = new_ans_list # できた正解候補をもとのリストと置き換える
     return ans_list
@@ -164,7 +167,6 @@ def get_result(room_id):
     table = get_table(room_id)
     result = [table["table"][-1]["hit"], table["table"][-1]["blow"]]
     return table, result
-
 #---------------------------------
 
 
@@ -190,9 +192,10 @@ def run_second_half(room_id, num_list):
         # ↓自分のターンなら
         post_guess(room_id, guess_number)
         table, result = get_result(room_id)
-        ans_list = narrow_ans_list(guess_number, result, ans_list)
+        ans_list = narrow_ans_list(guess_number, result, ans_list, strength=100)
         guess_number = ans_list[0]
         print(table["table"][-1])
+        print(len(ans_list))
 
 def main():
     room_id, hidden_number = run_first_half()
