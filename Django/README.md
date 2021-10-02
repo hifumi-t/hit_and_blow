@@ -3,16 +3,21 @@
 
 
 ## Django_setup
+```sh
 pip install pipenv
 cd < Move Directory >
 pipenv shell
 pipenv install django
 pipenv install --dev flake8 autopep8
 pipenv shell
-
+```
 
 ## How to start projects
-"config"フォルダを作成（ここで全体のセッティングなどを行う）
+- "config"フォルダを作成（ここで全体のセッティングなどを行う）
+```sh
 django-admin startproject config .
-ローカルのIPアドレスをget -> サイトが立ち上がる
+```
+- ローカルのIPアドレスをget -> サイトが立ち上がる
+```sh
 python manage.py runserver
+```
