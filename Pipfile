@@ -5,6 +5,10 @@ verify_ssl = true
 [packages]
 django = "*"
 brython = "*"
+requests = "*"
+numpy = "*"
+pandas = "*"
+streamlit = "*"
 
 [dev-packages]
 pytest = "==6.2.2"
