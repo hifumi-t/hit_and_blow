@@ -62,7 +62,7 @@ def enter_room(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> None
 def input_hidden(num_list) -> str:
     hidden_number = random.sample(num_list, 5)
     hidden_number = hidden_number[0]+hidden_number[1]+hidden_number[2]+hidden_number[3]+hidden_number[4]
-    return hidden_number
+    return str(hidden_number)
 
 # 相手に当てさせる番号をサーバーに送る
 def post_hidden(room_id:int, i_am:str=i_am, URL:str=URL, session=session) -> str:

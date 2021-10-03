@@ -1,4 +1,5 @@
 import random
+from typing import Tuple
 # hit and blow の判定用関数
 def hit_blow(guess, answer):
     hit = 0
@@ -51,7 +52,7 @@ def guess_func1(num_list, guess, answer, cost=0):
     return(guess, cost)
 
 
-def make_init2(answer) -> dict:
+def make_init2(answer) -> list:
     num_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
     guess=""
     memo=[]
@@ -63,7 +64,7 @@ def make_init2(answer) -> dict:
         memo.append(info)
     return(memo)
 
-def guess_func2(memo, answer) -> str:
+def guess_func2(memo, answer) -> Tuple:
     init_hit=0
     init_blow=0
     cost=0
