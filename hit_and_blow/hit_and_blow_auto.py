@@ -287,7 +287,6 @@ class HitAndBlow:
         :rtype: None
         :return: なし
         """
-        # self.guess_number = "12345"
         ans_list = self.make_ans_list()
         while True: # 無限ループ
             turn = False
@@ -307,7 +306,7 @@ class HitAndBlow:
             print(len(ans_list))
 
 def main():
-    runner = HitAndBlow()
+    runner = HitAndBlow(i_am="C", strength=100)
     runner.run_first_half()
     runner.run_second_half()
 
