@@ -19,6 +19,28 @@ class HitAndBlow:
         self.guess_number = "12345"
         self.strength = strength
 
+    def get_all_room(self):
+        """すべての対戦部屋情報の取得
+
+        :rtype: dict
+        :return: すべての対戦部屋情報
+        """
+        url_get_all_room = self.URL + "/rooms"
+        result = self.session.get(url_get_all_room)
+        result = result.json()
+        return result
+
+    def get_valid_room_id(self):
+        """入れる部屋（Cチーム用の中で一番若い数）
+
+        :rtype: int
+        :return: Cチーム用のIDの中で一番若い部屋ID
+        """
+        room_list_used = [i["id"] for i in self.result if i["id"]>=3000 and i["id"]<=3999]
+        room_list = [i for i in range(3000,4000) if i not in room_list_used ]
+        valid_id = room_list[0]
+        return valid_id
+
     def get_room(self) -> dict:
         """指定した対戦部屋情報の取得
 
@@ -301,40 +323,46 @@ class HitAndBlow:
         post_data = {"player_id": self.players[self.i_am],"guess": self.guess_number}
         self.session.post(url_post_guess, headers=headers, json=post_data)
 
-ply = HitAndBlow(i_am="C")
-com = HitAndBlow(i_am="C2",strength=100)
+def run(ply, com):
+    """ゲーム実行
 
-enter = ""
-while enter != True: # 部屋に入るまで繰り返す
-    room = ""
-    while room != True: # 入れる部屋を選ぶまで繰り返す
-        ply.room_id = ply.input_roomID()
-        com.room_id = ply.room_id
-        room =  ply.check_room()
-    enter =  ply.ask_enter_room()
-ply.enter_room()
-com.enter_room()
-ply.hidden_number = ply.post_hidden_ply()
-com.hidden_number = com.post_hidden_com()
+    :rtype: None
+    :return: なし
+    """
+    ply.result = ply.get_all_room()
+    ply.room_id = ply.get_valid_room_id()
+    com.room_id = ply.room_id
+    ply.enter_room()
+    com.enter_room()
+    ply.hidden_number = ply.post_hidden_ply()
+    com.hidden_number = com.post_hidden_com()
 
-turn = True
-com.ans_list = com.make_ans_list()
-while True: # 無限ループ
-    ply.table_result = ply.get_table()
-    if ply.check_win() == False:
-        ply.end_game()
-        break
-    else:
-        if turn == True:
-            ply.post_guess_ply()
-            ply.table_result = ply.get_table()
-            print(ply.table_result["table"][-1])
-            turn = False
+    turn = True
+    com.ans_list = com.make_ans_list()
+    while True: # 無限ループ
+        ply.table_result = ply.get_table()
+        if ply.check_win() == False:
+            ply.end_game()
+            break
         else:
-            com.post_guess_com()
-            table, result = com.get_result()
-            com.ans_list = com.narrow_ans_list()
-            com.guess_number = com.ans_list[0]
-            print(table["table"][-1])
-            print(len(com.ans_list))
-            turn = True
+            if turn == True:
+                ply.post_guess_ply()
+                ply.table_result = ply.get_table()
+                print(ply.table_result["table"][-1])
+                turn = False
+            else:
+                com.post_guess_com()
+                table, result = com.get_result()
+                com.ans_list = com.narrow_ans_list()
+                com.guess_number = com.ans_list[0]
+                print(table["table"][-1])
+                print(len(com.ans_list))
+                turn = True
+
+def main():
+    ply = HitAndBlow(i_am="C")
+    com = HitAndBlow(i_am="C2",strength=100)
+    run(ply, com)
+
+if __name__ == "__main__":
+    main()
