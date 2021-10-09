@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="hit_and_blow 入室" content="入室ページ">
+        <title>hit and blow</title>
+        <link href="../static/css/bootstrap.min.css" rel="stylesheet">
+        <script src="../static/js/brython.js"></script>
+        <script src="../static/js/brython_stdlib.js"></script>   
+    </head>
+
+    <body onload="brython()">
+        <script type="text/python" src="../static/python/game.py"></script>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <ul class="list-unstyled" id="record">
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <div class="btn-group-vertical ml-4 mt-4" role="group" aria-label="Basic example">
+                        <div class="btn-group">
+                            <input type="text" class="text-center form-control-lg mb-2" id="code">
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '0';">0</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '1';">1</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '2';">2</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '3';">3</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '4';">4</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '5';">5</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '6';">6</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '7';">7</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '8';">8</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '9';">9</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'a';">a</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'b';">b</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'c';">c</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'd';">d</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'e';">e</button>
+                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'f';">f</button>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value.slice(0, -1);">delete</button>
+                            <button type="button" id="send" class="btn btn-primary py-3" onclick="">Send your guess</button>
+                        </div>
+                    </div>
+                </div>
+            <div class="row">
+                <div class=="col align-self-center">
+                    <button type="button" id="game_start" class="btn btn-primary">Game Start</button>  
+                </div>
+            </div>
+        </div>
+        {% comment %} <button id="game_start">着席</button> {% endcomment %} 
+    </body>
+</html>
