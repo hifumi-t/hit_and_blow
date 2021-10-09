@@ -1,6 +1,6 @@
 <!doctype html>
 {% load static %}
-<html lang="en">
+<html lang="ja">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -39,22 +39,26 @@
     <body class="text-center">
     
         <main class="form-signin">
-            <form>
+            <form id="sign_in" action="../static/python/game.py">
+            {% csrf_token %}
                 <img class="mb-4" src="../static/img/pooh.jpeg" alt="" width="128" height="128">
-                <h1 class="h3 mb-3 fw-normal"> Please sign in </h1>
-                <label for="inputEmail" class="visually-hidden">Email address</label>
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-                <label for="inputPassword" class="visually-hidden">Password</label>
-                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                <div class="checkbox mb-3">
-                <label>
-                    <input type="checkbox" value="remember-me"> Remember me
-                </label>
+                <h1 class="h2 mb-3 fw-normal"> Welcome </h1>
+                <label for="player_name" class="mb-2">required information</label>
+                    <input type="text" id="player_name" value="{{ player_name }}" class="form-control" placeholder="Player name" required autpfocus>
+                <label for="hidden_num" class="visually-hidden"></label>
+                    <input type="text" id="hidden_num" value="{{ hidden_num }}" class="form-control" placeholder="5-digit number(0-f)" required>
+                <div class="input-group mb-3" required>
+                    <label class="input-group-text" for="cpu_level">cpu_level</label>
+                    <select class="form-select" id="cpu_level" value="{{ cpu_level }}">
+                        <option selected>Choose...</option>
+                        <option value="100">Hard</option>
+                        <option value="80">Normal</option>
+                        <option value="50">Easy</option>
+                    </select>
                 </div>
-                <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-                <p class="mt-5 mb-3 text-muted">&copy; 2017-2020</p>
+                <button class="w-100 btn btn-lg btn-primary" formaction="{% url "game" %}" type="submit">Entry</button>
+                <p class="mt-5 mb-3 text-muted">&copy; team-C 2021</p>
             </form>
         </main>
-
     </body>
 </html>
