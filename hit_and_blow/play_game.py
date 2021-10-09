@@ -306,11 +306,16 @@ class HitAndBlow:
         """
         headers = {"Content-Type" : "application/json"}
         url_post_guess = self.URL + "/rooms/" + str(self.room_id) + "/players/" + self.i_am + "/table/guesses"
-        post_data = {
-            "player_id": self.players[self.i_am],
-            "guess": input("相手の番号を推測して入力してください -->>")
-        }
-        self.session.post(url_post_guess, headers=headers, json=post_data)
+        while True:
+            post_data = {
+                "player_id": self.players[self.i_am],
+                "guess": input("相手の番号を推測して入力してください -->>")
+            }
+            result_post = self.session.post(url_post_guess, headers=headers, json=post_data)
+            if result_post.status_code == 200:
+                return self.hidden_number
+            else:
+                print("無効な入力がされました")
 
     def post_guess_com(self) -> None:
         """推測した数字を登録する
@@ -322,6 +327,13 @@ class HitAndBlow:
         url_post_guess = self.URL + "/rooms/" + str(self.room_id) + "/players/" + self.i_am + "/table/guesses"
         post_data = {"player_id": self.players[self.i_am],"guess": self.guess_number}
         self.session.post(url_post_guess, headers=headers, json=post_data)
+
+    def show_progress(self):
+        all_cases = 524160
+        progress = int(100 * (1 - len(self.ans_list) / all_cases ))
+        bar = "#" * (progress-60) + " " * (100-progress)
+        print("探索進捗率[{}]".format(bar))
+        print(progress) # 変数確認用
 
 def run(ply, com):
     """ゲーム実行
@@ -356,7 +368,8 @@ def run(ply, com):
                 com.ans_list = com.narrow_ans_list()
                 com.guess_number = com.ans_list[0]
                 print(table["table"][-1])
-                print(len(com.ans_list))
+                print("残りの候補は%d通り" % len(com.ans_list))
+                com.show_progress()
                 turn = True
 
 def main():
