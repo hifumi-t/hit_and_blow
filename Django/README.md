@@ -6,8 +6,8 @@
 ```sh
 pip install pipenv
 < Move Directory >
-pipenv shell
-pipenv install django browser brython
+pipenv install --python 3.9.6
+pipenv install requests django brython
 pipenv install --dev flake8 autopep8
 pipenv shell
 ```
