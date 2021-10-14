@@ -293,7 +293,7 @@ class HitAndBlow:
         print("-----------------")
 
 def main():
-    runner = HitAndBlow(i_am="C2", strength=100, battle=10)
+    runner = HitAndBlow(i_am="C2", strength=100, battle=100)
     runner.run()
 
 if __name__ == "__main__":
