@@ -6,59 +6,257 @@
         <meta name="hit_and_blow 入室" content="入室ページ">
         <title>hit and blow</title>
         <link href="../static/css/bootstrap.min.css" rel="stylesheet">
-        <script src="../static/js/brython.js"></script>
-        <script src="../static/js/brython_stdlib.js"></script>   
+        <script src="../static/js/bootstrap.bundle.min.js"></script>
+        {% comment %} <script src="../static/js/brython.js"></script>
+        <script src="../static/js/brython_stdlib.js"></script>    {% endcomment %}
+        <style type="text/css">
+            body {
+                {% comment %} font-family: -apple-system, BlinkMacSystemFont {% endcomment %}
+                font-family: Helvetica Neue;
+                background-color: #486d46;            /* 背景色 */
+                background-image: url("../static/img/cyber8.gif"); /* 画像 */
+                background-size: cover;               /* 全画面 */
+                background-attachment: fixed;         /* 固定 */
+                background-position: center center;   /* 縦横中央 */
+            }
+            .container {
+                margin: 0 auto;
+                text-align: center;
+                {% comment %} max-width: 2500px;
+                max-hight: 1600px; {% endcomment %}
+            }
+            .title{
+                font-size: 5rem;
+                text-transform: ;
+                font-weight: bold;
+                color: #99eeff;
+                margin-bottom: 10px;
+                margin-top: 20px;
+            }
+            .card{
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+            .subtitle{
+                font-size: 4rem;
+                color: #88ddff;
+                margin-bottom: 60px;
+            }
+            h2{
+                font-size: 2.5rem;
+                margin-bottom: 35px;
+            }
+            h3{
+                color: #cceeff;
+                font-size: 1.5rem;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+        </style>
     </head>
-
-    <body onload="brython()">
-        <script type="text/python" src="../static/python/game.py"></script>
+    {% comment %} <body onload="brython()"> {% endcomment %}
+    <body>
         <div class="container">
+            <div class="row justify-content-center">
+                <h1 class="title">HIT AND BLOW</h1>
+                <h1 class="subtitle">Challenger ... {{player_name}}</h1>
+            </div>
             <div class="row">
-                <div class="col-md-4">
-                    <ul class="list-unstyled" id="record">
-                    </ul>
+                <div class="col">
+                    <h2 style="color:skyblue; margin-bottom: 60px">Settitngs</h1>
+                    <h3>MY POINT : 520pt</h3>
+                    <h3>BET : 60pt</h3>
+                    <h3>MODE : Hard (×2.0)</h3>
+                    {% comment %} <input type="text" class="text-center form-control mb-2 bg-transparent text-light fs-3"  id="guess_num" > {% endcomment %}
+                    <div id="result" name="result" class="card"></div>
+                    <h3 style="margin-bottom: 40px">RETURN or LOSS ... 120pt</h3>
+                    <input type="hidden" name="hidden_num" id="hidden_num" value={{hidden_num}}>
+                    <input type="hidden" name="cpu_level" id="cpu_level" value={{cpu_level}}>
+                    <button type="button" id="game_start" class="btn btn-outline-light py-3 fs-3" onclick="clickBtn1()">GAME START</button>  
                 </div>
-                <div class="col-md-4">
-                    <div class="btn-group-vertical ml-4 mt-4" role="group" aria-label="Basic example">
-                        <div class="btn-group">
-                            <input type="text" class="text-center form-control-lg mb-2" id="code">
+                <div class="col" id="table_title">
+                    <h2 style="color: skyblue" > Table </h2>
+                </div>
+                <div class="col" id="record"> 
+                    <div class="row">
+                        <div class="col-6">
+                            <h3>CPU</h3>
+                            <h3>guess　hit　blow</h3>
+                            <h3 id="cg_1">12345 　1　　1　 </h3>
+                            <h3 id="cg_2">01367 　0　　1　 </h3>
+                            <h3 id="cg_3">1489a 　2　　2　 </h3>
+                            <h3 id="cg_4">1498b 　2　　1　 </h3>
+                            <h3 id="cg_5">14ac8 　4　　0　 </h3>
+                            <h3 id="cg_6">14ac9 　5　　0　 </h3>
                         </div>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '0';">0</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '1';">1</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '2';">2</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '3';">3</button>
-                        </div>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '4';">4</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '5';">5</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '6';">6</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '7';">7</button>
-                        </div>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '8';">8</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '9';">9</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'a';">a</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'b';">b</button>
-                        </div>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'c';">c</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'd';">d</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'e';">e</button>
-                            <button type="button" class="btn btn-outline-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'f';">f</button>
-                        </div>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-secondary py-3" onclick="document.getElementById('code').value=document.getElementById('code').value.slice(0, -1);">delete</button>
-                            <button type="button" id="send" class="btn btn-primary py-3" onclick="">Send your guess</button>
+                        <div class="col-6">
+                            <h3>{{player_name}}</h3>
+                            <h3>guess　hit　blow</h3>
+                            <h3 id="pg_1">01234 　0　　1　 </h3>
+                            <h3 id="pg_2">56789 　0　　1　 </h3>
+                            <h3 id="pg_3">01235 　0　　1　 </h3>
+                            <h3 id="pg_4">01236 　0　　1　 </h3>
+                            <h3 id="pg_5">01237 　0　　1　 </h3>
+                            <h3 id="pg_6">01238 　0　　2　 </h3>
+                            <div id="table">
+                            </div>
                         </div>
                     </div>
                 </div>
-            <div class="row">
-                <div class=="col align-self-center">
-                    <button type="button" id="game_start" class="btn btn-primary">Game Start</button>  
+                <div class="col">
+                    <h2 style="color: skyblue">Input your guess</h2>
+                    {% comment %} <form id="post_guess" action="/game/" method="post"> {% endcomment %}
+                    {% comment %} {% csrf_token %}   {% endcomment %}
+                        <div class="btn-group-vertical ml-4 mt-4" role="group" aria-label="Basic example">
+                            <div class="btn-group">
+                                {% comment %} <input type="text" class="text-center form-control mb-2 bg-transparent text-light fs-3" aria-describedby="send" id="code" name="code" placeholder="5-digit, No duplication" pattern=^[0-9a-f]+$ maxlength="5"> {% endcomment %}
+                                <input type="text" class="text-center form-control mb-2 bg-transparent text-light fs-3" id="code" name="code" placeholder="5-digit, No duplication" pattern=^[0-9a-f]+$ maxlength="5">
+                                <input type="hidden" name="h_player_name" id="h_player_name" value={{player_name}}> 
+                                <input type="hidden" name="h_hidden_num" id="h_hidden_num" value={{hidden_num}}>
+                                <input type="hidden" name="h_cpu_level" id="h_cpu_level" value={{cpu_level}}> 
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '0';">０</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '1';">１</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '2';">２</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '3';">３</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '4';">４</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '5';">５</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '6';">６</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '7';">７</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '8';">８</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + '9';">９</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'a';">ａ</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'b';">ｂ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'c';">ｃ</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'd';">ｄ</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'e';">ｅ</button>
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value + 'f';">ｆ</button>
+                            </div>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-light py-3" onclick="document.getElementById('code').value=document.getElementById('code').value.slice(0, -1);">delete</button>
+                                <button id="send" class="btn btn-outline-info py-3" onclick="clickBtn2()" type="button">Send your guess</button>
+                                {% comment %} <button id="send" class="btn btn-outline-info py-3" formaction="{% url "game" %}" type="submit">Send your guess</button> {% endcomment %}
+                            </div>
+                        </div>
+                    {% comment %} </form> {% endcomment %}
+                    <input type="hidden" name="guess" id="guess" value={{guess}}>
+                    <div id="turn", name="turn"></div>
                 </div>
             </div>
         </div>
-        {% comment %} <button id="game_start">着席</button> {% endcomment %} 
+        
+        </div> 
+
+        {% comment %} <script type="text/python" src="../static/python/game.py"></script> {% endcomment %}
+        <script>
+        //初期表示は非表示
+            window.addEventListener("load", initial())
+
+            function initial(){
+                document.getElementById("record").style.display ="none";
+                document.getElementById("table_title").style.display ="block";
+            }
+
+            function clickBtn1(){
+                const record = document.getElementById("record");
+                const table_title = document.getElementById("table_title");
+                const pg1 = document.getElementById("pg_1");
+                const pg2 = document.getElementById("pg_2");
+                const pg3 = document.getElementById("pg_3");
+                const pg4 = document.getElementById("pg_4");
+                const pg5 = document.getElementById("pg_5");
+                const pg6 = document.getElementById("pg_6");
+                const cg1 = document.getElementById("cg_1");
+                const cg2 = document.getElementById("cg_2");
+                const cg3 = document.getElementById("cg_3");
+                const cg4 = document.getElementById("cg_4");
+                const cg5 = document.getElementById("cg_5");
+                const cg6 = document.getElementById("cg_6");
+                record.style.display ="block";
+                table_title.style.display="none";
+                pg1.style.display ="none"
+                cg1.style.display ="none"
+                pg2.style.display ="none"
+                cg2.style.display ="none"
+                pg3.style.display ="none"
+                cg3.style.display ="none"
+                pg4.style.display ="none"
+                cg4.style.display ="none"
+                pg5.style.display ="none"
+                cg5.style.display ="none"
+                pg6.style.display ="none"
+                cg6.style.display ="none"
+                }
+
+            function cg1(){
+                const cg1 = document.getElementById("cg_1");
+                cg1.style.display ="block";
+            }
+            function cg2(){
+                const cg2 = document.getElementById("cg_2");
+                cg2.style.display ="block";
+            }
+            function cg3(){
+                const cg3 = document.getElementById("cg_3");
+                cg3.style.display ="block";
+            }
+            function cg4(){
+                const cg4 = document.getElementById("cg_4");
+                cg4.style.display ="block";
+            }
+            function cg5(){
+                const cg5 = document.getElementById("cg_5");
+                cg5.style.display ="block";
+            }
+            function cg6(){
+                const cg6 = document.getElementById("cg_6");
+                cg6.style.display ="block";
+            }
+
+            function clickBtn2(){
+                const pg1 = document.getElementById("pg_1");
+                const pg2 = document.getElementById("pg_2");
+                const pg3 = document.getElementById("pg_3");
+                const pg4 = document.getElementById("pg_4");
+                const pg5 = document.getElementById("pg_5");
+                const pg6 = document.getElementById("pg_6");
+                const code = document.getElementById("code");
+                code.value="";
+                if (pg1.style.display=="none"){
+                    pg1.style.display ="block";
+                    setTimeout(cg1, 2000);
+                }
+                else if(pg2.style.display=="none"){
+                    pg2.style.display ="block";
+                    setTimeout(cg2, 1000);
+                }
+                else if(pg3.style.display=="none"){
+                    pg3.style.display ="block";
+                    setTimeout(cg3, 1000);
+                }
+                else if(pg4.style.display=="none"){
+                    pg4.style.display ="block";
+                    setTimeout(cg4, 1000);
+                }
+                else if(pg5.style.display=="none"){
+                    pg5.style.display ="block";
+                    setTimeout(cg5, 1000);
+                }
+                else if(pg6.style.display=="none"){
+                    pg6.style.display ="block";
+                    setTimeout(cg6, 1000);
+                }
+                else{
+                    ;
+                }
+            }
+        </script>
     </body>
 </html>
