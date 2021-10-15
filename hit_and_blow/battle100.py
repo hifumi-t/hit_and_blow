@@ -22,7 +22,6 @@ class HitAndBlow:
 
     def get_all_room(self):
         """すべての対戦部屋情報の取得
-
         :rtype: dict
         :return: すべての対戦部屋情報
         """
@@ -33,7 +32,6 @@ class HitAndBlow:
 
     def get_valid_room_id(self):
         """入れる部屋（Cチーム用の中で一番若い数）
-
         :rtype: int
         :return: Cチーム用のIDの中で一番若い部屋ID
         """
@@ -44,7 +42,6 @@ class HitAndBlow:
 
     def get_room(self) -> dict:
         """指定した対戦部屋情報の取得
-
         :rtype: dict
         :return: 部屋の情報{
                             "id": int,
@@ -67,7 +64,6 @@ class HitAndBlow:
 
     def enter_room(self) -> None:
         """対戦部屋へユーザーを登録
-
         :rtype: None
         :return: なし
         """
@@ -82,7 +78,6 @@ class HitAndBlow:
 
     def input_hidden(self) -> str:
         """相手が当てる数字を登録する
-
         :rtype: str
         :return: 相手が当てる数字
         """
@@ -92,7 +87,6 @@ class HitAndBlow:
 
     def post_hidden(self) -> str:
         """相手が当てる数字をサーバーに送る
-
         :rtype: str
         :return: 相手が当てる数字
         """
@@ -114,7 +108,6 @@ class HitAndBlow:
 
     def get_table(self) -> dict:
         """対戦情報テーブル(現在のターン, hit&blowの履歴, 勝敗の判定)を取得する
-
         :rtype: dict
         :return: 対戦情報テーブル{
                     "room_id": int,
@@ -144,7 +137,6 @@ class HitAndBlow:
 
     def check_win(self) -> bool:
         """勝敗が決まったかチェック
-
         :rtype: bool
         :return: 勝敗が続くならTrue
         """
@@ -155,7 +147,6 @@ class HitAndBlow:
 
     def check_turn(self) -> bool:
         """自分のターンかチェック
-
         :rtype: bool
         :return: 自分のターンならTrue
         """
@@ -166,7 +157,6 @@ class HitAndBlow:
 
     def end_game(self) -> None:
         """ゲーム終了(0なら勝ち1なら引き分け2なら負け)
-
         :rtype: None
         :return: なし
         """
@@ -183,7 +173,6 @@ class HitAndBlow:
     #----------------------------------アルゴリズム
     def hit_blow(self) -> List[Union[int, int]]:
         """予測と正解からヒットとブローの数を返す
-
         :rtype: List[int, int]
         :return: [ヒット, ブロー]
         """
@@ -198,7 +187,6 @@ class HitAndBlow:
 
     def make_ans_list(self) -> list:
         """初期正解候補を作る
-
         :rtype: list
         :return: 初期正解候補
         """
@@ -210,7 +198,6 @@ class HitAndBlow:
 
     def narrow_ans_list(self) -> list:
         """正解候補を絞る
-
         :rtype: list
         :return: 正解候補
         """
@@ -230,7 +217,6 @@ class HitAndBlow:
 
     def get_result(self) -> Tuple[dict, List[Union[int, int]]]:
         """テーブルからヒットとブローの結果を返す
-
         :rtype: tuple[dict, List[int, int]]
         :return: テーブル，
         """
@@ -241,7 +227,6 @@ class HitAndBlow:
 
     def post_guess(self) -> None:
         """推測した数字を登録する
-
         :rtype: None
         :return: なし
         """
@@ -271,7 +256,8 @@ class HitAndBlow:
                 self.post_guess()
                 table, result = self.get_result()
                 ans_list = self.narrow_ans_list()
-                self.guess_number = ans_list[0]
+                index = random.randint(0,len(ans_list)-1)
+                self.guess_number = ans_list[index]
                 # print(table["table"][-1])
                 # print(len(ans_list))
 
@@ -293,7 +279,7 @@ class HitAndBlow:
         print("-----------------")
 
 def main():
-    runner = HitAndBlow(i_am="C2", strength=100, battle=100)
+    runner = HitAndBlow(i_am="C", strength=100, battle=100)
     runner.run()
 
 if __name__ == "__main__":
