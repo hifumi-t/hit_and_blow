@@ -1,13 +1,13 @@
 import itertools
-import requests
 import random
 from typing import List, Tuple, Union
-
+from browser import document, html, ajax, timer
+import json
 class HitAndBlow:
 
     def __init__(self, i_am="C", strength=100) -> None:
         self.URL = "https://damp-earth-70561.herokuapp.com"
-        self.session = requests.Session()
+        #self.session = requests.Session()
         self.num_list = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
         self.players = {"C":"290d6313-c662-45b6-82d6-6afb631ade08", 
                     "C2":"3cd613ef-a0c0-447c-bc23-81dcf1648be9"}
@@ -19,19 +19,20 @@ class HitAndBlow:
         self.guess_number = "12345"
         self.strength = strength
 
-        #self.strength = request.POST["sign_in"]["cpu_level"]
-        #self.hidden_number = request.POST["sign_in"]["hidden_num"]
-
     def get_all_room(self):
+        import json
         """すべての対戦部屋情報の取得
 
         :rtype: dict
         :return: すべての対戦部屋情報
         """
         url_get_all_room = self.URL + "/rooms"
-        result = self.session.get(url_get_all_room)
-        result = result.json()
-        return result
+        req = ajax.Ajax()
+        req.open('GET', url_get_all_room, False)   #False
+        req.send()
+        response = json.loads(req.responseText)
+        #document['result'].text = response
+        return(response)
 
     def get_valid_room_id(self):
         """入れる部屋（Cチーム用の中で一番若い数）
@@ -44,76 +45,23 @@ class HitAndBlow:
         valid_id = room_list[0]
         return valid_id
 
-    def get_room(self) -> dict:
-        """指定した対戦部屋情報の取得
-
-        :rtype: dict
-        :return: 部屋の情報{
-                            "id": int,
-                            "state": int,
-                            "player1": "string",
-                            "player2": "string"
-                            }
-        """
-        url_get_room = self.URL + "/rooms/" + str(self.room_id)
-        result = self.session.get(url_get_room)
-        return result.json()
-
-    def input_roomID(self) -> int:
-        """部屋IDの入力
-
-        :rtype: int
-        :return: ルームID
-        """
-        self.room_id = input("入室したい対戦部屋のIDを入力してください -->>")
-        self.room_id = int(self.room_id)
-        return self.room_id
-
-    def check_room(self) -> bool:
-        """部屋の情報を取得して，状況を返す
-
-        :rtype: bool
-        :return: 入れる部屋かどうか
-        """
-        get_room_result = self.get_room()
-        if get_room_result["state"] == -1:
-            print("部屋には誰もいません")
-            return True
-        elif get_room_result["state"] == 1:
-            print("{}が待機しています".format(get_room_result["player1"]))
-            return True
-        else:
-            print("すでに部屋が満席です．別の部屋IDを入力してください")
-            return False
-
-    def ask_enter_room(self) -> bool:
-        """部屋に入室するか選択する
-
-        :rtype: bool
-        :return: 部屋に入るならTrue
-        """
-        while True:
-            ans = input("入室しますか？[y/n] -->>")
-            if ans == "y":
-                return True
-            elif ans == "n":
-                return False
-            else:
-                print("y/n以外の入力がされました．入力をやり直してください")
-
     def enter_room(self) -> None:
         """対戦部屋へユーザーを登録
-
         :rtype: None
         :return: なし
         """
-        headers = {"Content-Type" : "application/json"}
+        #headers = {"Content-Type" : "application/json"}
         url_enter_room = self.URL + "/rooms"
         post_data = {
             "player_id": self.players[self.i_am],
             "room_id": self.room_id
             }
-        self.session.post(url_enter_room, headers=headers, json=post_data)
+        post_data = json.dumps(post_data)
+        req = ajax.Ajax()
+        req.open('POST', url_enter_room, False)     
+        req.set_header("Content-Type", "application/json")
+        req.send(post_data)
+        #document["result"].text = req.text
 
     def input_hidden_ply(self) -> str:
         """相手が当てる数字を登録する
@@ -121,7 +69,7 @@ class HitAndBlow:
         :rtype: str
         :return: 相手が当てる数字
         """
-        self.hidden_number = input("相手が当てる番号を入力してください -->>")
+        self.hidden_number = document["hidden_num"].value
         return self.hidden_number
 
     def post_hidden_ply(self) -> str:
@@ -130,22 +78,26 @@ class HitAndBlow:
         :rtype: str
         :return: 相手が当てる数字
         """
-        headers = {"Content-Type" : "application/json"}
+        #headers = {"Content-Type" : "application/json"}
         url_get_table = self.URL + "/rooms/" + str(self.room_id) + "/players/" + self.i_am + "/hidden"
-        
         while True:
             self.hidden_number = self.input_hidden_ply()
             post_data = {
                 "player_id": self.players[self.i_am],
-                "hidden_number": self.hidden_number
+                "hidden_number": self.hidden_number,
             }
-            result_post = self.session.post(url_get_table, headers=headers, json=post_data)
-            if result_post.status_code == 200:
-                print(f"{self.hidden_number}を相手に当ててもらいます")
-                #document["hid"].text = str(self.hidden_number)
-                return self.hidden_number
+            post_data = json.dumps(post_data)
+            req = ajax.Ajax()
+            req.open('POST', url_get_table, False)      
+            req.set_header("Content-Type", "application/json")
+            req.send(post_data)
+            #document["result"].text = req.status
+            if req.status == 200:
+                return(self.hidden_number)
             else:
-                print("無効な入力がされました")
+                #document["result"].text = "数字の重複は避けてください"
+                break
+                #リダイレクト
 
     def input_hidden_com(self) -> str:
         """相手が当てる数字を登録する
@@ -163,20 +115,19 @@ class HitAndBlow:
         :rtype: str
         :return: 相手が当てる数字
         """
-        headers = {"Content-Type" : "application/json"}
+        #headers = {"Content-Type" : "application/json"}
         url_get_table = self.URL + "/rooms/" + str(self.room_id) + "/players/" + self.i_am + "/hidden"
-        
-        while True:
-            self.hidden_number = self.input_hidden_com()
-            post_data = {
-                "player_id": self.players[self.i_am],
-                "hidden_number": self.hidden_number
-            }
-            result_post = self.session.post(url_get_table, headers=headers, json=post_data)
-            if result_post.status_code == 200:
-                return self.hidden_number
-            else:
-                print("無効な入力がされました")
+        self.hidden_number = self.input_hidden_com()
+        post_data = {
+            "player_id": self.players[self.i_am],
+            "hidden_number": self.hidden_number,
+        }
+        post_data = json.dumps(post_data)
+        req = ajax.Ajax()
+        req.set_header("Content-Type", "application/json")
+        req.open('POST', url_get_table, False)
+        req.send(post_data)
+        return(self.hidden_number)
 
     def get_table(self) -> dict:
         """対戦情報テーブル(現在のターン, hit&blowの履歴, 勝敗の判定)を取得する
@@ -204,9 +155,13 @@ class HitAndBlow:
                     "game_end_count": int
                     }
         """
+        import json
         url_get_table =  self.URL + "/rooms/" + str(self.room_id) + "/players/" + self.i_am + "/table"
-        self.table_result = self.session.get(url_get_table)
-        return self.table_result.json()
+        req = ajax.Ajax()
+        req.open('GET', url_get_table, False)
+        req.send()
+        response = json.loads(req.responseText)
+        return(response)
 
     def check_win(self) -> bool:
         """勝敗が決まったかチェック
@@ -237,11 +192,11 @@ class HitAndBlow:
         :return: なし
         """
         if self.table_result["winner"] == self.i_am:
-            print("あなたの勝ちです！おめでとう！")
+            document["result"].text = "YOU WIN"
         elif self.table_result["winner"] == None:
-            print("引き分けです")
+            document["result"].text = "DRAW"
         else:
-            print("あなたの負けです...")
+            document["result"].text = "YOU LOSE"
 
     #----------------------------------アルゴリズム
     def hit_blow(self) -> List[Union[int, int]]:
@@ -277,9 +232,10 @@ class HitAndBlow:
         :rtype: list
         :return: 正解候補
         """
+        from .ans_list import Ans
         new_ans_list = []
-        length = len(self.ans_list)
-        for self.ans in self.ans_list[:length+1]:
+        length = len(Ans)
+        for self.ans in Ans[:length+1]:
             h_b = self.hit_blow()
             lot = random.randint(0,100)
             if h_b == self.result: # 結果と一致するなら
@@ -308,13 +264,28 @@ class HitAndBlow:
         :rtype: None
         :return: なし
         """
-        headers = {"Content-Type" : "application/json"}
+        #headers = {"Content-Type" : "application/json"}
         url_post_guess = self.URL + "/rooms/" + str(self.room_id) + "/players/" + self.i_am + "/table/guesses"
         post_data = {
             "player_id": self.players[self.i_am],
-            "guess": input("相手の番号を推測して入力してください -->>")
+            "guess": document["guess"].value
         }
-        self.session.post(url_post_guess, headers=headers, json=post_data)
+        post_data = json.dumps(post_data)
+        req = ajax.Ajax()
+        req.open('POST', url_post_guess, False) 
+        req.bind("complete", self.on_complete)
+        req.set_header("Content-Type", "application/json")
+        req.send(post_data)
+
+    def on_complete(self, req):
+        if req.status == 200:
+            table_result = self.get_table()
+            r = list(table_result["table"][-1].values())
+            r_str = "guess: " + str(r[0]) + ", hit: " + str(r[1]) + ", blow: " + str(r[2])
+            document["table"] <= html.P(r_str)
+            return(self.hidden_number)
+        else:
+            print("無効")
 
     def post_guess_com(self) -> None:
         """推測した数字を登録する
@@ -322,68 +293,144 @@ class HitAndBlow:
         :rtype: None
         :return: なし
         """
-        headers = {"Content-Type" : "application/json"}
+        #headers = {"Content-Type" : "application/json"}
         url_post_guess = self.URL + "/rooms/" + str(self.room_id) + "/players/" + self.i_am + "/table/guesses"
         post_data = {"player_id": self.players[self.i_am],"guess": self.guess_number}
-        self.session.post(url_post_guess, headers=headers, json=post_data)
+        post_data = json.dumps(post_data)
+        req = ajax.Ajax()
+        req.open('POST', url_post_guess, True)
+        req.set_header("Content-Type", "application/json")
+        req.send(post_data.json())
 
-def run(ply, com):
+roomid=""
+p_hidden_number=""
+c_hidden_number =""
+
+def run(event):
+    global roomid, p_hidden_number, c_hidden_number
     """ゲーム実行
-
     :rtype: None
     :return: なし
     """
+    ply = HitAndBlow(i_am="C")
+    com = HitAndBlow(i_am="C2",strength=document["cpu_level"].value)
     ply.result = ply.get_all_room()
     ply.room_id = ply.get_valid_room_id()
+    roomid = ply.room_id
     com.room_id = ply.room_id
     ply.enter_room()
     com.enter_room()
-    ply.hidden_number = ply.post_hidden_ply()
-    com.hidden_number = com.post_hidden_com()
+    p_hidden_number = ply.post_hidden_ply()
+    c_hidden_number = com.post_hidden_com()
+    document["result"].text = "your turn"
+    #document["turn"] <= html.H3("Your turn") 
 
-    turn = True
-    com.ans_list = com.make_ans_list()
-    while True: # 無限ループ
-        ply.table_result = ply.get_table()
-        if ply.check_win() == False:
-            ply.end_game()
-            break
+
+def guess(event):
+    global roomid,  p_hidden_number, c_hidden_number
+    ply = HitAndBlow(i_am="C")
+    com = HitAndBlow(i_am="C2", strength=document["cpu_level"].value)
+    ply.hidden_number = p_hidden_number
+    com.hidden_number = c_hidden_number
+    com.room_id = roomid
+    ply.room_id = roomid
+    ply.table_result = ply.get_table()
+    if ply.check_win() == False:    # 勝敗が決まっていたら, ゲーム終了
+        ply.end_game()
+    else:
+        if ply.table_result["now_player"] == "C":   #自分のターンなら, 
+            ply.post_guess_ply()
         else:
-            if turn == True:
-                ply.post_guess_ply()
-                ply.table_result = ply.get_table()
-                print(ply.table_result["table"][-1])
-                turn = False
-            else:
-                com.post_guess_com()
-                table, result = com.get_result()
-                com.ans_list = com.narrow_ans_list()
-                com.guess_number = com.ans_list[0]
-                print(table["table"][-1])
-                print(len(com.ans_list))
-                turn = True
+            # com.post_guess_com()
+            # table, result = com.get_result()
+            # com.ans_list = com.narrow_ans_list()
+            # com.guess_number = com.ans_list[0]
+            # document["record"] <= html.LI(table["table"][-1])
+            pass
+
+
+
+
+    # turn=True
+    # while True: # ループ
+    #     ply.table_result = ply.get_table()
+    #     if ply.check_win() == False:    # 勝敗が決まっていたら, ゲーム終了
+    #         ply.end_game()
+    #         break
+    #     else:
+    #         if turn == True:   #自分のターンなら, 
+    #             document["turn"] <= html.H4("Your turn")          
+    #             while len(document["guess"].value) == 0:    
+    #                 pass
+    #             else:                           # guessの値が入ったら
+    #                 ply.post_guess_ply()
+    #                 document["guess"].clear()
+    #                 turn = False
+    #                 #document["guess"].value = "27654"
+    #         else:
+    #             # com.post_guess_com()
+    #             # table, result = com.get_result()
+    #             # com.ans_list = com.narrow_ans_list()
+    #             # com.guess_number = com.ans_list[0]
+    #             # document["record"] <= html.LI(table["table"][-1])
+    #             turn = True
+    #             break
+
+def insert(event):
+    record = document["record"]
+    code = document["code"]
+    if len(code.value) != 5:
+        code.value = "5 digit only"
+
+    elif len(code.value) != len(set(code.value)):
+        code.value = "No duplication"
+
+    else:
+        record <= html.LI(code.value)
+        code.value = ""
+
+def nothing():
+    pass
+
+def ur_turn():
+    document["code"].value = "Your turn"
+
+def clear():
+    document["code"].value = ""
+
+def think():
+    document["code"].value = "Let's think"
+
+def Turn(turn):
+    turn=False
+    return turn
+
+def zip(com):
+    # document["guess"].value = "17654"
+    document["table"] <= html.H3(com.hidden_number)
+
+def post_wait(ply):
+        #document["result"].text = len(document["guess"].value)
+        if len(document["guess"].value) != 0:
+            ply.post_guess_ply()
+            ply.table_result = ply.get_table()
+            document["result"].text = ply.table_result["table"][-1]
+            # document["guess"].value = None
+            # timer.set_timeout(Turn(turn), 5000)
+        else:
+            # continue
+            document["guess"].value = "27654"
+
+def flag(flag):
+    flag = True
+    return(flag)
 
 def main():
-    #from browser import document, html
-    ply = HitAndBlow(i_am="C")
-    com = HitAndBlow(i_am="C2",strength=100)
-
-    # def insert(event):
-    #     record = document["record"]
-    #     code = document["code"]
-    #     record <= html.LI(code.value)
-    #     code.value = ''
+    # document["check"].bind("click", check)
     # document["send"].bind("click", insert)
-    # document["game_start"].bind("click", run(ply,com))
-    run(ply, com)
+    document["game_start"].bind("click", run())
+    document["send"].bind("click", guess())
+    #run(ply, com)
 
 if __name__ == "__main__":
     main()
-
-# from browser import document, html
-# def insert(event):
-#         record = document["record"]
-#         code = document["code"]
-#         record <= html.LI(code.value)
-#         code.value = ''
-# document["send"].bind("click", insert)
